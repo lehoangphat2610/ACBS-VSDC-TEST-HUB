@@ -1,0 +1,16 @@
+{
+  "GatewayFolders": {
+    "Send": "H:\\Send",
+    "Receive": "H:\\Receive",
+    "Archive": "H:\\Archive",
+    "Error": "H:\\Error",
+    "AllowedExtensions": [
+      ".fin",
+      ".par",
+      ".csv"
+    ],
+    "ScanIntervalMilliseconds": 1000,
+    "ReconciliationIntervalSeconds": 15,
+    "FileStableMilliseconds": 800
+  }
+}

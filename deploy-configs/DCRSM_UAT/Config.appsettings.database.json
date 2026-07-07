@@ -1,0 +1,11 @@
+{
+  "ConnectionStrings": {
+    "VsdcDb": "Server=.\\SQLEXPRESS;Database=ACBS_VSDC_TESTHUB;User ID=sa;Password=ACBS@01;TrustServerCertificate=True;MultipleActiveResultSets=True"
+  },
+  "Database": {
+    "Provider": "SqlServer",
+    "EnsureCreated": false,
+    "EnableSensitiveDataLogging": false,
+    "CommandTimeoutSeconds": 60
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "Urls": "http://0.0.0.0:9898",
+  "Hosting": {
+    "ApplicationName": "ACBS VSDC Test Hub",
+    "PublicBaseUrl": "http://localhost:9898",
+    "PathBase": ""
+  }
+}
