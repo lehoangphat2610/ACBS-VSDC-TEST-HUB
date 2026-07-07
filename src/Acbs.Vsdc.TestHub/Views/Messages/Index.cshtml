@@ -1,0 +1,37 @@
+@model MessageListViewModel
+@{ ViewData["Title"] = "Quản lý điện"; }
+<div class="page-title"><div><h1>Quản lý message gửi/nhận</h1><p>Dữ liệu đã bóc tách từ SQL Server.</p></div></div>
+<section class="panel filters">
+<form method="get">
+<div class="form-grid compact">
+<label>Từ ngày<input type="date" name="fromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")" /></label>
+<label>Đến ngày<input type="date" name="toDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")" /></label>
+<label>Chiều<select name="direction">
+<option value="">Tất cả</option>
+@if (Model.Direction == MessageDirection.Incoming)
+{
+    <option value="Incoming" selected>Nhận</option>
+}
+else
+{
+    <option value="Incoming">Nhận</option>
+}
+@if (Model.Direction == MessageDirection.Outgoing)
+{
+    <option value="Outgoing" selected>Gửi</option>
+}
+else
+{
+    <option value="Outgoing">Gửi</option>
+}
+</select></label>
+<label>Loại điện<input name="messageType" value="@Model.MessageType" /></label>
+<label>Nghiệp vụ<input name="operation" value="@Model.Operation" /></label>
+<label>Trạng thái<input name="status" value="@Model.Status" /></label>
+<label class="wide">Từ khóa<input name="keyword" value="@Model.Keyword" placeholder="Số TT, file, tài khoản..." /></label>
+<div class="actions"><button class="btn primary" type="submit">Tìm</button><a class="btn" asp-action="Index">Xóa lọc</a></div>
+</div></form></section>
+<section class="panel"><div class="panel-head"><h2>@Model.TotalCount message</h2></div><div class="table-wrap"><table><thead><tr><th>Số TT</th><th>Ngày GD</th><th>Chiều</th><th>Nghiệp vụ</th><th>Loại nghiệp vụ</th><th>Tài khoản</th><th>Trạng thái</th><th>TT tham chiếu</th><th>Tên file</th><th>Thời gian</th><th></th></tr></thead><tbody>
+@foreach (var item in Model.Items)
+{<tr><td>@item.Reference</td><td>@item.PreparationDate?.ToString("yyyy/MM/dd")</td><td>@item.Direction</td><td>@item.MessageType</td><td>@item.OperationName</td><td>@item.AccountNo</td><td>@item.ProcessingStatus</td><td>@item.RelatedReference</td><td>@item.GatewayFile.OriginalFileName</td><td>@item.CreatedAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</td><td><a asp-action="Details" asp-route-id="@item.Id">Chi tiết</a></td></tr>}
+</tbody></table></div></section>

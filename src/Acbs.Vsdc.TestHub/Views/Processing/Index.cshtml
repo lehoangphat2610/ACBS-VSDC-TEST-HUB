@@ -1,0 +1,42 @@
+@model ProcessingIndexViewModel
+@{ ViewData["Title"] = "Xử lý điện"; }
+<div class="page-title"><div><h1>Xử lý điện theo folder</h1><p>Tải file từ Send / Receive / Error / Archive, lưu file chưa có, ghi đè hoặc xóa dữ liệu tại điểm lưu.</p></div></div>
+@if (!string.IsNullOrWhiteSpace(Model.ResultMessage))
+{
+    <div class="alert success">@Model.ResultMessage</div>
+}
+<section class="panel filters">
+<form method="post" asp-action="Load" id="processing-form">
+@Html.AntiForgeryToken()
+<div class="form-grid compact">
+<label>Từ ngày<input type="date" name="fromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")" /></label>
+<label>Đến ngày<input type="date" name="toDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")" /></label>
+<label>Folder<select name="folderKind" asp-for="FolderKind" asp-items="Html.GetEnumSelectList<GatewayFolderKind>()"></select></label>
+<label class="wide">Từ khóa<input name="keyword" value="@Model.Keyword" placeholder="Tên file, mã báo cáo, số TT..." /></label>
+<div class="actions wide">
+    <button class="btn primary" type="submit" formaction='@Url.Action("Load")'>Tải</button>
+    <button class="btn" type="submit" formaction='@Url.Action("SaveNew")'>Lưu file chưa có</button>
+    <button class="btn warning" type="submit" formaction='@Url.Action("Overwrite")' data-confirm="Dữ liệu đã có của bạn sẽ bị ghi đè lên. Bạn có muốn tiếp tục?">Ghi đè</button>
+    <button class="btn danger" type="submit" formaction='@Url.Action("DeleteAll")' data-confirm="Dữ liệu đã có của bạn sẽ bị xóa hết. Bạn có muốn tiếp tục?">Xóa toàn bộ</button>
+</div>
+</div>
+</form>
+</section>
+<section class="panel">
+<div class="panel-head"><h2>Kết quả tải: @Model.Files.Count file</h2><span class="muted">Chỉ hiển thị *.fin, *.csv, *.par</span></div>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Đuôi</th><th>Kích thước</th><th>Ngày sửa</th><th>Đã có DB</th><th>Trạng thái DB</th><th>Đường dẫn</th></tr></thead><tbody>
+@foreach (var file in Model.Files)
+{
+<tr><td>@file.FileName</td><td>@file.Extension</td><td>@file.SizeBytes</td><td>@file.LastWriteTime.ToString("dd/MM/yyyy HH:mm:ss")</td><td>@(file.ExistsInDatabase ? "Có" : "Chưa")</td><td>@file.DatabaseStatus</td><td class="mono">@file.FullPath</td></tr>
+}
+</tbody></table></div>
+</section>
+@section Scripts {
+<script>
+document.querySelectorAll('[data-confirm]').forEach(function(button){
+    button.addEventListener('click', function(e){
+        if(!confirm(button.getAttribute('data-confirm'))){ e.preventDefault(); }
+    });
+});
+</script>
+}

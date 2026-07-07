@@ -1,0 +1,7 @@
+@model OutgoingMessageForm
+@{ ViewData["Title"] = "Tạo điện gửi VSDC"; }
+<div class="page-title"><div><h1>Mode Test với VSDC</h1><p>Tạo điện FIN và ghi trực tiếp vào \\CSD\Send.</p></div></div>
+<section class="panel"><form method="post"><div asp-validation-summary="All" class="validation"></div><div class="form-grid">
+<label>Module nghiệp vụ<select asp-for="Operation"><option value="ACCOUNT_OPEN">Mở tài khoản</option><option value="ACCOUNT_CLOSE">Đóng tài khoản</option><option value="ACCOUNT_MAPPING">Liên kết tài khoản</option><option value="ACCOUNT_MODIFY">Thay đổi thông tin tài khoản</option></select></label>
+<label>Số tham chiếu<input asp-for="Reference" /></label><label>Tài khoản<input asp-for="AccountNo" /></label><label>Họ tên khách hàng<input asp-for="CustomerName" /></label><label>Tài khoản liên kết<input asp-for="TargetAccount" /></label><label>Giấy tờ định danh<input asp-for="IdentityNo" /></label><label class="wide">Ghi chú<textarea asp-for="Note" rows="4"></textarea></label><div class="actions wide"><button class="btn primary" type="submit">Tạo điện và gửi vào Send</button></div></div></form></section>
+<div class="notice">Các tag trong bộ nguồn là template khởi tạo. Trước khi chạy UAT/Production cần thay bằng mapping chính xác theo đặc tả điện VSDC của từng nghiệp vụ.</div>

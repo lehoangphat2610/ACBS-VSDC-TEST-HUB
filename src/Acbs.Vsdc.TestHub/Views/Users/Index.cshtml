@@ -1,0 +1,45 @@
+@model UserAdminListViewModel
+@{ ViewData["Title"] = "Quản lý Users"; }
+<div class="page-title"><div><h1>Quản lý Users</h1><p>Tạo user, phân quyền Admin / Tester / Viewer, khóa/mở và xóa tài khoản. User <b>admin</b> là tài khoản hệ thống mặc định nên không được xóa.</p></div><a class="btn primary" asp-action="Create">+ Tạo user</a></div>
+<section class="panel filter-panel">
+    <form method="get" class="form-grid compact">
+        <label class="wide">Từ khóa<input name="keyword" value="@Model.Keyword" placeholder="Username, tên hiển thị, email" /></label>
+        <div class="actions"><button class="btn primary" type="submit">Tìm</button><a class="btn" asp-action="Index">Reset</a></div>
+    </form>
+</section>
+<section class="panel">
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>ID</th><th>User</th><th>Tên hiển thị</th><th>Email</th><th>Roles</th><th>Trạng thái</th><th>Last login</th><th>Thao tác</th></tr></thead>
+            <tbody>
+            @foreach (var u in Model.Users)
+            {
+                var isDefaultAdmin = string.Equals(u.UserName, "admin", StringComparison.OrdinalIgnoreCase);
+                <tr>
+                    <td>@u.Id</td>
+                    <td><b>@u.UserName</b>@(isDefaultAdmin ? " / Protected" : "")</td>
+                    <td>@u.DisplayName</td>
+                    <td>@u.Email</td>
+                    <td>@u.Roles</td>
+                    <td><span class="badge @(u.IsActive ? "ok" : "bad")">@(u.IsActive ? "Active" : "Locked")</span>@(u.MustChangePassword ? " / Must change pass" : "")</td>
+                    <td>@(u.LastLoginAtUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
+                    <td class="row-actions">
+                        <a class="btn tiny" asp-action="Edit" asp-route-id="@u.Id">Sửa</a>
+                        <form method="post" asp-action="ToggleActive" asp-route-id="@u.Id">
+                            @Html.AntiForgeryToken()
+                            <button class="btn tiny @(u.IsActive ? "danger" : "primary")" type="submit">@(u.IsActive ? "Khóa" : "Mở")</button>
+                        </form>
+                        @if (!isDefaultAdmin)
+                        {
+                            <form method="post" asp-action="Delete" asp-route-id="@u.Id" onsubmit="return confirm('User @u.UserName sẽ bị xóa khỏi hệ thống. Bạn có muốn tiếp tục?');">
+                                @Html.AntiForgeryToken()
+                                <button class="btn tiny danger" type="submit">Xóa</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

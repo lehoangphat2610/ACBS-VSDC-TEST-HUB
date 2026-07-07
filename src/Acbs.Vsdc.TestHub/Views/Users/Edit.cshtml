@@ -1,0 +1,42 @@
+@model UserEditViewModel
+@{
+    var isCreate = Model.Id is null;
+    ViewData["Title"] = isCreate ? "Tạo User" : "Sửa User";
+    var formAction = isCreate ? "Create" : "Edit";
+    var passwordPlaceholder = isCreate ? "Bắt buộc" : "Để trống nếu không đổi";
+}
+<div class="page-title compact-title"><div><h1>@ViewData["Title"]</h1><p>Admin là quyền cao nhất; Tester dùng để tạo điện và thao tác Simulator; Viewer chỉ xem.</p></div></div>
+<section class="panel form-panel">
+<form method="post" asp-action="@formAction">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="All" class="validation"></div>
+    <div class="form-grid">
+        <label>Username<input asp-for="UserName" /></label>
+        <label>Tên hiển thị<input asp-for="DisplayName" /></label>
+        <label>Email<input asp-for="Email" /></label>
+        <label>Password mới<input asp-for="NewPassword" placeholder="@passwordPlaceholder" /></label>
+        <label class="check-card"><input asp-for="IsActive" /> Active</label>
+        <label class="check-card"><input asp-for="MustChangePassword" /> Bắt đổi mật khẩu lần sau</label>
+        <label class="wide">Ghi chú<textarea asp-for="Note"></textarea></label>
+    </div>
+    <div class="role-grid">
+        @foreach (var role in Model.AvailableRoles)
+        {
+            <label class="role-card">
+                @if (Model.SelectedRoles.Contains(role))
+                {
+                    <input type="checkbox" name="SelectedRoles" value="@role" checked />
+                }
+                else
+                {
+                    <input type="checkbox" name="SelectedRoles" value="@role" />
+                }
+                <span>@role</span>
+                <small>@(role == "Admin" ? "Toàn quyền hệ thống" : role == "Tester" ? "Tạo điện, Simulator, test nghiệp vụ" : "Chỉ xem dữ liệu")</small>
+            </label>
+        }
+    </div>
+    <div class="actions"><button class="btn primary" type="submit">Lưu user</button><a class="btn" asp-action="Index">Quay lại</a></div>
+</form>
+</section>

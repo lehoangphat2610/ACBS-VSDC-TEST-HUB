@@ -1,0 +1,8 @@
+@model GatewayMessage
+@{ ViewData["Title"] = "Chi tiết điện"; }
+<div class="page-title"><div><h1>Chi tiết message #@Model.Id</h1><p>@Model.GatewayFile.OriginalFileName</p></div><a class="btn" asp-action="Index">Quay lại</a></div>
+<div class="detail-grid">
+<section class="panel"><h2>Thông tin chung</h2><dl><dt>Chiều</dt><dd>@Model.Direction</dd><dt>Loại điện</dt><dd>@Model.MessageType</dd><dt>Nghiệp vụ</dt><dd>@Model.OperationName</dd><dt>Reference</dt><dd>@Model.Reference</dd><dt>Tài khoản</dt><dd>@Model.AccountNo</dd><dt>Trạng thái</dt><dd>@Model.ProcessingStatus</dd></dl></section>
+<section class="panel"><h2>Tags đã bóc tách</h2><div class="table-wrap"><table><thead><tr><th>#</th><th>Tag</th><th>Qualifier</th><th>Value</th></tr></thead><tbody>@foreach(var tag in Model.Tags.OrderBy(x=>x.SequenceNo)){<tr><td>@tag.SequenceNo</td><td>@tag.TagCode</td><td>@tag.Qualifier</td><td class="mono">@tag.TagValue</td></tr>}</tbody></table></div></section>
+</div>
+<section class="panel"><h2>Nội dung nguyên bản</h2><pre>@Model.RawContent</pre></section>

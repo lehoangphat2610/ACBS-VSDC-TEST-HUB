@@ -1,0 +1,88 @@
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment
+@inject Acbs.Vsdc.TestHub.Services.Simulator.SimulatorRuntimeState SimulatorState
+@{
+    var displayUser = User?.Identity?.IsAuthenticated == true && !string.IsNullOrWhiteSpace(User.Identity?.Name)
+        ? User.FindFirst("display_name")?.Value ?? User.Identity!.Name!
+        : "Guest";
+    var isAdmin = User?.IsInRole("Admin") == true;
+    var canTest = isAdmin || User?.IsInRole("Tester") == true;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - ACBS VSDC Test Hub</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+<header class="topbar">
+    <div class="trade-date"><span>Ngày giao dịch</span><strong>@DateTime.Now.ToString("dd/MM/yyyy")</strong></div>
+    <a class="brand" asp-area="" asp-controller="Home" asp-action="Index"><span class="brand-dot">◆</span> ACBS VSDC TEST HUB</a>
+    <nav>
+        <a asp-area="" asp-controller="Home" asp-action="Index">Trang chủ</a>
+        <a asp-area="" asp-controller="Messages" asp-action="Index">Quản lý điện</a>
+        <a asp-area="" asp-controller="Processing" asp-action="Index">Xử lý điện</a>
+        @if (canTest)
+        {
+            <a asp-area="MSP" asp-controller="MspTest" asp-action="Index">Mode Test MSP</a>
+            <a asp-area="" asp-controller="Simulator" asp-action="Index">Mode Simulator</a>
+        }
+        <a asp-area="" asp-controller="Logs" asp-action="Index">Logs hệ thống</a>
+        @if (isAdmin)
+        {
+            <a asp-area="" asp-controller="Users" asp-action="Index">Users</a>
+        }
+    </nav>
+
+    <div class="user-menu" data-user-menu>
+        <button type="button" class="user-menu-button" data-user-menu-button aria-haspopup="true" aria-expanded="false">
+            <span class="user-avatar">👤</span>
+            <span>@displayUser</span>
+            <span class="user-caret">▾</span>
+        </button>
+        <div class="user-menu-panel" data-user-menu-panel>
+            <div class="user-menu-header">
+                <strong>@displayUser</strong>
+                <span>@(User?.Identity?.Name ?? "anonymous")</span>
+            </div>
+            <div class="user-menu-meta">
+                <div><span>Môi trường</span><strong>@HostEnvironment.EnvironmentName</strong></div>
+                <div><span>AutoMode</span><strong>@(SimulatorState.AutoModeEnabled ? "ON" : "OFF")</strong></div>
+            </div>
+            <a asp-area="" asp-controller="Home" asp-action="Index">Trang chủ</a>
+            <a asp-area="" asp-controller="Messages" asp-action="Index">Quản lý điện gửi/nhận</a>
+            <a asp-area="" asp-controller="Processing" asp-action="Index">Xử lý điện</a>
+            @if (canTest)
+            {
+                <a asp-area="" asp-controller="Simulator" asp-action="Index">Điều khiển Simulator</a>
+            }
+            <a asp-area="" asp-controller="Logs" asp-action="Index">Xem logs hệ thống</a>
+            @if (isAdmin)
+            {
+                <a asp-area="" asp-controller="Users" asp-action="Index">Quản lý users</a>
+            }
+            <a asp-area="" asp-controller="Account" asp-action="ChangePassword">Đổi mật khẩu</a>
+            <form method="post" asp-area="" asp-controller="Account" asp-action="Logout" class="logout-form">
+                @Html.AntiForgeryToken()
+                <button type="submit">Đăng xuất</button>
+            </form>
+        </div>
+    </div>
+</header>
+<div class="hero-strip"></div>
+<main class="page-shell">
+    @if (TempData["Success"] is string success)
+    {
+        <div class="alert success">@success</div>
+    }
+    @if (TempData["Error"] is string error)
+    {
+        <div class="alert error">@error</div>
+    }
+    @RenderBody()
+</main>
+<script src="~/js/site.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

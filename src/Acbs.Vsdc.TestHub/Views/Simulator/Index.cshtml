@@ -1,0 +1,65 @@
+@model SimulatorViewModel
+@{ ViewData["Title"] = "Simulator"; }
+<div class="page-title feature-title">
+    <div>
+        <span class="eyebrow">Mode giả lập nội bộ</span>
+        <h1>Simulator điều khiển gửi / nhận MSP</h1>
+        <p>Mô phỏng VSDC.MSP: AutoMode quét Send, ManualMode tạo FIN/PAR/CSV trực tiếp vào Receive.</p>
+    </div>
+    <span class="status-pill @(Model.AutoModeEnabled ? "on" : "off")">AutoMode: @(Model.AutoModeEnabled ? "ON" : "OFF")</span>
+</div>
+<section class="panel simulator-card">
+    <div class="panel-head">
+        <div><h2>AutoMode</h2><p>Tự động quét Send, tạo phản hồi vào Receive và chuyển nguyên file gốc sang Archive.</p></div>
+        <form method="post" asp-action="SetAutoMode">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="enabled" value="@(!Model.AutoModeEnabled)" />
+            <button class="btn @(Model.AutoModeEnabled ? "danger" : "primary")" type="submit">@(Model.AutoModeEnabled ? "Tắt AutoMode" : "Bật AutoMode")</button>
+        </form>
+    </div>
+    <div class="folder-grid premium">
+        <div><b>Send</b><code>@Model.SendFolder</code></div>
+        <div><b>Receive</b><code>@Model.ReceiveFolder</code></div>
+        <div><b>Archive</b><code>@Model.ArchiveFolder</code></div>
+        <div><b>Error</b><code>@Model.ErrorFolder</code></div>
+    </div>
+    <div class="api-list">
+        <div class="api-card get"><span>GET</span><code>/api/vsdc-simulator/auto-mode/status</code><small>Trạng thái AutoMode</small><button class="btn tiny api-action" data-api-method="GET" data-api-url="/api/vsdc-simulator/auto-mode/status">Thực hiện</button></div>
+        <div class="api-card post"><span>POST</span><code>/api/vsdc-simulator/auto-mode/start</code><small>Bật chế độ tự động</small><button class="btn tiny api-action" data-api-method="POST" data-api-url="/api/vsdc-simulator/auto-mode/start">Thực hiện</button></div>
+        <div class="api-card post"><span>POST</span><code>/api/vsdc-simulator/auto-mode/stop</code><small>Tắt chế độ tự động</small><button class="btn tiny api-action" data-api-method="POST" data-api-url="/api/vsdc-simulator/auto-mode/stop">Thực hiện</button></div>
+    </div>
+    <pre class="api-result" data-api-result>Chọn một API hoặc ManualMode để thực hiện.</pre>
+</section>
+<section class="panel simulator-card">
+    <div class="panel-head"><div><h2>ManualMode</h2><p>Nhấn mở từng module, nhập reference rồi tạo file FIN hoặc cặp PAR/CSV vào Receive.</p></div></div>
+    <div class="manual-grid">
+    @foreach (var t in Model.Templates)
+    {
+        var parts = t.TemplateBody.Split('|');
+        var operation = parts[0];
+        var result = parts.Length > 1 ? parts[1] : "ACCEPT";
+        var defaultReference = $"MAN{DateTime.Now:HHmmss}";
+        var defaultReason = result == "REJECT" ? "[T44] VSDCODE not found or deactived[T83] User: not registered" : "ACCEPTED";
+        <div class="manual-card">
+            <button type="button" class="manual-card-head" data-toggle-manual>
+                <span class="method-pill">POST</span>
+                <div><b>@t.Name</b><code>/api/vsdc-simulator/manual/@operation.ToLowerInvariant()</code></div>
+                <span class="manual-caret">▾</span>
+            </button>
+            <form class="manual-card-body" method="post" asp-action="Manual">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Operation" value="@operation" />
+                <input type="hidden" name="Result" value="@result" />
+                <div class="form-grid compact">
+                    <label>Reference<input name="Reference" value="@defaultReference" /></label>
+                    <label>Tài khoản<input name="AccountNo" value="006C000001" /></label>
+                    <label>TK liên kết / đối ứng<input name="TargetAccount" placeholder="Tùy chọn" /></label>
+                    <label>Lý do<input name="Reason" value="@defaultReason" /></label>
+                </div>
+                <div class="actions"><button class="btn primary" type="submit">Tạo file vào Receive</button><button type="button" class="btn api-action" data-api-method="POST" data-api-url="/api/vsdc-simulator/manual/@operation.ToLowerInvariant()" data-api-body-form="manual">Gọi API JSON</button></div>
+            </form>
+        </div>
+    }
+    </div>
+</section>
+<section class="panel"><h2>Lịch sử chạy gần nhất</h2><div class="table-wrap"><table><thead><tr><th>Thời gian</th><th>File nguồn</th><th>File phản hồi</th><th>Reference</th><th>Trạng thái</th><th>Lỗi</th></tr></thead><tbody>@foreach(var r in Model.LatestRuns){<tr><td>@r.StartedAtUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</td><td>@r.SourceFileName</td><td>@r.ResponseFileName</td><td>@r.Reference</td><td>@r.Status</td><td>@r.ErrorMessage</td></tr>}</tbody></table></div></section>

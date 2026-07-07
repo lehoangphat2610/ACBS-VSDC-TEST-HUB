@@ -1,0 +1,28 @@
+@model IReadOnlyList<SystemLog>
+@{ ViewData["Title"] = "Logs hệ thống"; var selectedLevel = (string?)ViewBag.Level; }
+<div class="page-title"><div><h1>Logs hệ thống</h1><p>Theo dõi worker, parser, simulator và lỗi file theo khoảng thời gian.</p></div></div>
+<section class="panel filters">
+<form method="get">
+<div class="form-grid compact">
+<label>Từ ngày<input type="date" name="fromDate" value="@(((DateTime?)ViewBag.FromDate)?.ToString("yyyy-MM-dd"))" /></label>
+<label>Đến ngày<input type="date" name="toDate" value="@(((DateTime?)ViewBag.ToDate)?.ToString("yyyy-MM-dd"))" /></label>
+<label>Level<select name="level">
+    <option value="">Tất cả</option>
+    @foreach (var level in new[] { "INFO", "WARNING", "ERROR" })
+    {
+        if (selectedLevel == level)
+        {
+            <option value="@level" selected>@level</option>
+        }
+        else
+        {
+            <option value="@level">@level</option>
+        }
+    }
+</select></label>
+<label class="wide">Từ khóa<input name="keyword" value="@ViewBag.Keyword" placeholder="Event, category, nội dung log..." /></label>
+<div class="actions"><button class="btn primary">Tìm</button><a class="btn" asp-action="Index">Xóa lọc</a></div>
+</div>
+</form>
+</section>
+<section class="panel"><div class="panel-head"><h2>@Model.Count logs</h2></div><div class="table-wrap"><table><thead><tr><th>Thời gian</th><th>Level</th><th>Category</th><th>Event</th><th>Message</th><th>Correlation</th></tr></thead><tbody>@foreach(var log in Model){<tr><td>@log.LoggedAtUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss.fff")</td><td>@log.Level</td><td>@log.Category</td><td>@log.EventCode</td><td>@log.Message</td><td>@log.CorrelationId</td></tr>}</tbody></table></div></section>

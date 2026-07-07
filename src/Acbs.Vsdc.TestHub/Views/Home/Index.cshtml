@@ -1,0 +1,18 @@
+@model DashboardViewModel
+@{ ViewData["Title"] = "Dashboard"; }
+<div class="page-title"><div><h1>ACBS – VSDC Core Test Hub</h1><p>Giám sát trao đổi FIN, PAR, CSV và điều khiển chế độ giả lập nội bộ.</p></div><span class="status-pill @(Model.AutoModeEnabled ? "on" : "off")">AutoMode: @(Model.AutoModeEnabled ? "ON" : "OFF")</span></div>
+<div class="cards">
+    <div class="metric"><span>Điện nhận hôm nay</span><strong>@Model.IncomingToday</strong></div>
+    <div class="metric"><span>Điện gửi hôm nay</span><strong>@Model.OutgoingToday</strong></div>
+    <div class="metric"><span>File lỗi hôm nay</span><strong>@Model.FailedToday</strong></div>
+    <div class="metric"><span>Logs hôm nay</span><strong>@Model.LogsToday</strong></div>
+</div>
+<section class="panel">
+    <div class="panel-head"><h2>Điện mới nhất</h2><a class="btn" asp-controller="Messages" asp-action="Index">Xem tất cả</a></div>
+    <div class="table-wrap"><table><thead><tr><th>ID</th><th>Chiều</th><th>File</th><th>Loại điện</th><th>Nghiệp vụ</th><th>Tài khoản</th><th>Trạng thái</th><th>Thời gian</th><th></th></tr></thead><tbody>
+    @foreach (var item in Model.LatestMessages)
+    {
+        <tr><td>@item.Id</td><td>@item.Direction</td><td>@item.GatewayFile.OriginalFileName</td><td>@item.MessageType</td><td>@item.OperationName</td><td>@item.AccountNo</td><td>@item.ProcessingStatus</td><td>@item.CreatedAtUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</td><td><a asp-controller="Messages" asp-action="Details" asp-route-id="@item.Id">Chi tiết</a></td></tr>
+    }
+    </tbody></table></div>
+</section>

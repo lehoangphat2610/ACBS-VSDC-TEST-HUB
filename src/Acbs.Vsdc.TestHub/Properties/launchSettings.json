@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Acbs.Vsdc.TestHub": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:62289;http://localhost:62290"
+    }
+  }
+}
