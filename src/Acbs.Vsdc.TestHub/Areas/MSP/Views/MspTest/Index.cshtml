@@ -1,0 +1,76 @@
+@model MspCreateMenuViewModel
+@{
+    ViewData["Title"] = "MSP - Tạo điện";
+    var securities = Model.Items.Where(x => x.Code.Contains("SECURITIES")).ToList();
+    var cash = Model.Items.Where(x => x.Code.Contains("CASH")).ToList();
+    var settlement = Model.Items.Where(x => x.Code.Contains("SETTLEMENT")).ToList();
+    var inquiry = Model.Items.Where(x => x.Code.Contains("STATUS") || x.Code.Contains("RECONCILE")).ToList();
+}
+
+<div class="page-title feature-title msp-hero-card">
+    <div>
+        <span class="eyebrow">Mode Test VSDC.MSP</span>
+        <h1>Tạo điện nghiệp vụ MSP gửi VSDC</h1>
+        <p>Chọn module nghiệp vụ, nhập dữ liệu, review nội dung FIN rồi ghi file atomically vào thư mục Send.</p>
+    </div>
+    <div class="title-actions">
+        <a class="btn" asp-area="" asp-controller="Messages" asp-action="Index">📥 Xem điện gửi/nhận</a>
+        <a class="btn primary" asp-area="" asp-controller="Simulator" asp-action="Index">⚙ Mở Simulator</a>
+    </div>
+</div>
+
+<section class="msp-workflow">
+    <div class="workflow-step"><span>1</span><b>Chọn nghiệp vụ</b><small>MT524, MT199, MT541, MT543, MT599</small></div>
+    <div class="workflow-line"></div>
+    <div class="workflow-step"><span>2</span><b>Nhập thông tin</b><small>Mỗi module có form riêng</small></div>
+    <div class="workflow-line"></div>
+    <div class="workflow-step"><span>3</span><b>Review raw FIN</b><small>Kiểm tra tag trước khi gửi</small></div>
+    <div class="workflow-line"></div>
+    <div class="workflow-step"><span>4</span><b>Gửi vào Send</b><small>Core test / VSDC.MSP xử lý</small></div>
+</section>
+
+<section class="panel msp-module-panel">
+    <div class="panel-head">
+        <div>
+            <h2>Danh mục module nghiệp vụ</h2>
+            <p>Giao diện được chia theo nhóm để tester thao tác nhanh, không phải dò từng link thô.</p>
+        </div>
+        <span class="status-chip">@Model.Items.Count module</span>
+    </div>
+
+    <div class="msp-category-grid">
+        @RenderGroup("A", "Phong tỏa / Giải tỏa chứng khoán", "Tạo yêu cầu MT524 cho nghiệp vụ chuyển trạng thái số dư chứng khoán.", securities, "📌")
+        @RenderGroup("B", "Phong tỏa / Giải tỏa tiền", "Tạo điện MT199 dạng narrative có cấu trúc cho cash block/unblock.", cash, "💰")
+        @RenderGroup("C", "Thanh toán giao dịch", "Tạo chỉ thị thanh toán mua/bán MT541 và MT543.", settlement, "🔁")
+        @RenderGroup("D", "Tra soát / Đối chiếu", "Tạo điện tra soát trạng thái và yêu cầu báo cáo đối chiếu.", inquiry, "🔎")
+    </div>
+</section>
+
+<section class="panel guide-panel">
+    <div class="panel-head">
+        <div>
+            <h2>Quy ước thao tác</h2>
+            <p>Mỗi màn hình module đều có khung Review FIN. Tester có thể sửa dữ liệu, xem lại tag, rồi mới bấm tạo file.</p>
+        </div>
+    </div>
+    <div class="checklist-grid">
+        <div><b>✓ Không ghi trực tiếp khi chưa vào form</b><span>Trang này chỉ chọn module.</span></div>
+        <div><b>✓ Review trước khi gửi</b><span>Raw FIN được hiển thị bên phải form.</span></div>
+        <div><b>✓ File gửi đi nằm trong Send</b><span>D:\VSDC\CSD\Send theo config hiện tại.</span></div>
+        <div><b>✓ Có thể xem lại trong Quản lý điện</b><span>File sau khi tạo được ingest vào DB.</span></div>
+    </div>
+</section>
+
+@functions {
+    private Microsoft.AspNetCore.Html.IHtmlContent RenderGroup(string letter, string title, string description, IReadOnlyList<MspOperationMenuItem> items, string icon)
+    {
+        var html = new System.Text.StringBuilder();
+        html.Append($"<div class=\"msp-category-card\"><div class=\"category-head\"><div class=\"category-badge\">{letter}</div><div><h3>{title}</h3><p>{description}</p></div><div class=\"category-icon\">{icon}</div></div><div class=\"category-actions\">");
+        foreach (var item in items)
+        {
+            html.Append($"<a class=\"msp-operation-row\" href=\"/MSP/MspTest/{item.Action}\"><span class=\"mt-pill\">MT{item.MessageType}</span><span><b>{item.Name}</b><small>{item.Code}</small></span><em>Nhập / Review →</em></a>");
+        }
+        html.Append("</div></div>");
+        return new Microsoft.AspNetCore.Html.HtmlString(html.ToString());
+    }
+}

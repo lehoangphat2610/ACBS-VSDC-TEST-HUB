@@ -1,0 +1,13 @@
+@model ReconcileInquiryForm
+@{
+    ViewData["Title"] = "MT599 - Yêu cầu báo cáo đối chiếu";
+}
+<div class="page-title compact-title">
+    <div><span class="eyebrow">Mode Test MSP / Module D</span><h1>Yêu cầu báo cáo đối chiếu</h1><p>Tạo MT599 yêu cầu VSDC.MSP phản hồi báo cáo đối chiếu điện đi/đến theo ngày dữ liệu.</p></div>
+    <div class="title-actions"><a class="btn" asp-action="Index">← Danh mục MSP</a><a class="btn" asp-area="" asp-controller="Messages" asp-action="Index">Xem điện</a></div>
+</div>
+<section class="msp-editor-layout" data-msp-editor data-msp-type="599" data-msp-function="Yêu cầu báo cáo đối chiếu" data-msp-operation="MSP_RECONCILE_INQUIRY">
+    <aside class="msp-editor-side"><div class="side-card active"><span>D</span><b>Đối chiếu điện</b><small>MSP_RECONCILE_INQUIRY</small></div><div class="side-note"><b>Kết quả mong đợi</b><p>VSDC.MSP hoặc Simulator trả về MT599 response kèm cặp file CSV/PAR.</p></div></aside>
+    <section class="panel msp-editor-main"><form method="post" class="msp-form" data-preview-form>@Html.AntiForgeryToken()<div asp-validation-summary="All" class="validation"></div><div class="section-caption"><span>01</span><b>Thông tin báo cáo</b></div><div class="form-grid compact"><label>Reference<input asp-for="Reference" data-fin="reference" /></label><label>Ngân hàng nhận / Block 2<input asp-for="ReceiverBic" data-fin="receiverBic" list="receiver-bank-list" /></label><label>Ngày dữ liệu<input type="date" asp-for="TradeDate" data-fin="date" /></label></div><div class="actions editor-actions"><button type="button" class="btn" data-refresh-preview>🔄 Cập nhật review</button><button class="btn primary" type="submit">📤 Tạo MT599 vào Send</button></div><datalist id="receiver-bank-list"><option value="VSDC404X">Citibank</option><option value="VSDC403X">Deutsche Bank</option></datalist></form></section>
+    <aside class="panel msp-preview-panel"><div class="preview-head"><div><span class="eyebrow">Review điện</span><h2>Raw FIN preview</h2></div><button class="btn tiny" type="button" data-copy-preview>Copy</button></div><div class="preview-meta"><span>Message Type: <b>MT599</b></span><span>Operation: <b>MSP_RECONCILE_INQUIRY</b></span></div><pre class="fin-preview" data-fin-preview></pre><div class="preview-warning">Review ngày dữ liệu báo cáo trước khi gửi yêu cầu.</div></aside>
+</section>

@@ -1,0 +1,51 @@
+@model Mt199CashForm
+@{
+    var unblock = ViewContext.RouteData.Values["action"]?.ToString() == "CashUnblock";
+    ViewData["Title"] = unblock ? "MT199 - Giải tỏa tiền" : "MT199 - Phong tỏa tiền";
+    var functionName = unblock ? "Giải tỏa tiền" : "Phong tỏa tiền";
+    var operationCode = unblock ? "MSP_CASH_UNBLOCK" : "MSP_CASH_BLOCK";
+}
+
+<div class="page-title compact-title">
+    <div>
+        <span class="eyebrow">Mode Test MSP / Module B</span>
+        <h1>@ViewData["Title"]</h1>
+        <p>Điện MT199 dùng narrative có cấu trúc. Tester kiểm tra các khóa /FUNC/, /ACCOUNT/, /AMOUNT/, /CURRENCY/ trước khi gửi.</p>
+    </div>
+    <div class="title-actions"><a class="btn" asp-action="Index">← Danh mục MSP</a><a class="btn" asp-area="" asp-controller="Messages" asp-action="Index">Xem điện</a></div>
+</div>
+
+<section class="msp-editor-layout" data-msp-editor data-msp-type="199" data-msp-function="@functionName" data-msp-operation="@operationCode">
+    <aside class="msp-editor-side">
+        <div class="side-card active"><span>B</span><b>@functionName</b><small>@operationCode</small></div>
+        <div class="side-note"><b>Tag chính</b><p>:20, :21, :79 với các khóa /FUNC/, /ACCOUNT/, /AMOUNT/, /CURRENCY/, /REASON/.</p></div>
+        <div class="side-note"><b>Lưu ý</b><p>Với giải tỏa tiền, nên nhập reference yêu cầu phong tỏa trước để đối chiếu.</p></div>
+    </aside>
+    <section class="panel msp-editor-main">
+        <form method="post" class="msp-form" data-preview-form>
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="All" class="validation"></div>
+            <div class="section-caption"><span>01</span><b>Thông tin tham chiếu</b></div>
+            <div class="form-grid compact">
+                <label>Reference / :20<input asp-for="Reference" data-fin="reference" /></label>
+                <label>Related reference / :21<input asp-for="RelatedReference" data-fin="related" /></label>
+                <label>Ngân hàng nhận / Block 2<input asp-for="ReceiverBic" data-fin="receiverBic" list="receiver-bank-list" /></label>
+                <label>Reference phong tỏa trước<input asp-for="PreviousReference" data-fin="previous" /></label>
+                <label>Tài khoản<input asp-for="AccountNo" data-fin="account" /></label>
+            </div>
+            <div class="section-caption"><span>02</span><b>Thông tin tiền</b></div>
+            <div class="form-grid compact">
+                <label>Số tiền<input asp-for="Amount" data-fin="amount" /></label>
+                <label>Tiền tệ<input asp-for="Currency" data-fin="currency" /></label>
+                <label class="wide">Lý do<textarea asp-for="Reason" rows="3" data-fin="reason"></textarea></label>
+            </div>
+            <div class="actions editor-actions"><button type="button" class="btn" data-refresh-preview>🔄 Cập nhật review</button><button class="btn primary" type="submit">📤 Tạo MT199 vào Send</button></div>
+        <datalist id="receiver-bank-list"><option value="VSDC404X">Citibank</option><option value="VSDC403X">Deutsche Bank</option></datalist></form>
+    </section>
+    <aside class="panel msp-preview-panel">
+        <div class="preview-head"><div><span class="eyebrow">Review điện</span><h2>Raw FIN preview</h2></div><button class="btn tiny" type="button" data-copy-preview>Copy</button></div>
+        <div class="preview-meta"><span>Message Type: <b>MT199</b></span><span>Operation: <b>@operationCode</b></span></div>
+        <pre class="fin-preview" data-fin-preview></pre>
+        <div class="preview-warning">Review narrative trước khi tạo file để tránh sai khóa nghiệp vụ.</div>
+    </aside>
+</section>

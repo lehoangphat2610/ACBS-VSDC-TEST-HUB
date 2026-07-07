@@ -1,0 +1,101 @@
+@model Mt524Form
+@{
+    var actionName = ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty;
+    var unblock = ViewData["Mt524IsUnblock"] as bool? ?? actionName.Contains("Unblock", StringComparison.OrdinalIgnoreCase);
+    var cancel = ViewData["Mt524IsCancel"] as bool? ?? actionName.Contains("Cancel", StringComparison.OrdinalIgnoreCase);
+    ViewData["Title"] = (unblock, cancel) switch
+    {
+        (false, false) => "MT524 - Phong tỏa chứng khoán",
+        (false, true) => "MT524 - Hủy yêu cầu phong tỏa chứng khoán",
+        (true, false) => "MT524 - Giải tỏa chứng khoán",
+        (true, true) => "MT524 - Hủy yêu cầu giải tỏa chứng khoán"
+    };
+    var functionName = (unblock, cancel) switch
+    {
+        (false, false) => "Phong tỏa chứng khoán",
+        (false, true) => "Hủy yêu cầu phong tỏa chứng khoán",
+        (true, false) => "Giải tỏa chứng khoán",
+        (true, true) => "Hủy yêu cầu giải tỏa chứng khoán"
+    };
+    var operationCode = (unblock, cancel) switch
+    {
+        (false, false) => "MSP_SECURITIES_BLOCK",
+        (false, true) => "MSP_SECURITIES_BLOCK_CANCEL",
+        (true, false) => "MSP_SECURITIES_UNBLOCK",
+        (true, true) => "MSP_SECURITIES_UNBLOCK_CANCEL"
+    };
+    var relatedLabel = (unblock, cancel) switch
+    {
+        (false, false) => "Không dùng cho yêu cầu phong tỏa mới",
+        (false, true) => "Tham chiếu điện phong tỏa gốc",
+        (true, false) => "Tham chiếu điện phong tỏa trước đó",
+        (true, true) => "Tham chiếu điện giải tỏa vừa gửi"
+    };
+    var relatedRequired = unblock || cancel;
+}
+
+<div class="page-title compact-title">
+    <div>
+        <span class="eyebrow">Mode Test MSP / Module A</span>
+        <h1>@ViewData["Title"]</h1>
+        <p>Nhập thông tin yêu cầu MT524, kiểm tra raw FIN ở khung review, rồi mới tạo file vào Send.</p>
+    </div>
+    <div class="title-actions">
+        <a class="btn" asp-action="Index">← Danh mục MSP</a>
+        <a class="btn" asp-area="" asp-controller="Messages" asp-action="Index">Xem điện</a>
+    </div>
+</div>
+
+<section class="msp-editor-layout" data-msp-editor data-msp-type="524" data-msp-function="@functionName" data-msp-operation="@operationCode" data-msp-unblock="@(unblock ? "true" : "false")" data-msp-cancel="@(cancel ? "true" : "false")">
+    <aside class="msp-editor-side">
+        <div class="side-card active"><span>A</span><b>@functionName</b><small>@operationCode</small></div>
+        <div class="side-note"><b>Tag chính</b><p>Block 1 VSDC002X, Block 2 ngân hàng nhận, :20C::SEME, :23G, :97A::SAFE, :35B, :36B::SETT, :98A::SETT, :93A::FROM, :93A::TOBA</p></div>
+        <div class="side-note"><b>LINK/PREV</b><p>Phong tỏa mới không sinh LINK. Hủy phong tỏa, giải tỏa và hủy giải tỏa bắt buộc sinh :20C::PREV.</p></div>
+        <div class="side-note"><b>Luồng xử lý</b><p>Form → Review FIN → Tạo file *.fin → Send folder → Ingest DB.</p></div>
+    </aside>
+
+    <section class="panel msp-editor-main">
+        <form method="post" class="msp-form" data-preview-form>
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="All" class="validation"></div>
+            <div class="section-caption"><span>01</span><b>Thông tin tham chiếu</b></div>
+            <div class="form-grid compact">
+                <label>Reference / :20C::SEME<input asp-for="Reference" data-fin="reference" /></label>
+                <label>@relatedLabel
+                    @if (relatedRequired)
+                    {
+                        <input asp-for="RelatedReference" data-fin="related" />
+                    }
+                    else
+                    {
+                        <input asp-for="RelatedReference" data-fin="related" disabled />
+                    }
+                </label>
+                <label>Ngân hàng nhận / Block 2<input asp-for="ReceiverBic" data-fin="receiverBic" list="receiver-bank-list" /></label>
+                <label>Tài khoản SAFE / :97A<input asp-for="AccountNo" data-fin="account" /></label>
+                <label>Ngày hiệu lực / :98A<input type="date" asp-for="EffectiveDate" data-fin="date" /></label>
+            </div>
+            <div class="section-caption"><span>02</span><b>Thông tin chứng khoán</b></div>
+            <div class="form-grid compact">
+                <label>ISIN / :35B<input asp-for="Isin" data-fin="isin" /></label>
+                <label>Khối lượng / :36B<input asp-for="Quantity" data-fin="quantity" /></label>
+                <label class="wide">Diễn giải / :70E<textarea asp-for="Narrative" rows="3" data-fin="narrative"></textarea></label>
+            </div>
+            <div class="actions editor-actions">
+                <button type="button" class="btn" data-refresh-preview>🔄 Cập nhật review</button>
+                <button class="btn primary" type="submit">📤 Tạo MT524 vào Send</button>
+            </div>
+        <datalist id="receiver-bank-list">
+                <option value="VSDC404X">Citibank</option>
+                <option value="VSDC403X">Deutsche Bank</option>
+            </datalist>
+        </form>
+    </section>
+
+    <aside class="panel msp-preview-panel">
+        <div class="preview-head"><div><span class="eyebrow">Review điện</span><h2>Raw FIN preview</h2></div><button class="btn tiny" type="button" data-copy-preview>Copy</button></div>
+        <div class="preview-meta"><span>Message Type: <b>MT524</b></span><span>Operation: <b>@operationCode</b></span></div>
+        <pre class="fin-preview" data-fin-preview></pre>
+        <div class="preview-warning">Khung này giúp tester review nhanh trước khi gửi. File thực tế vẫn được tạo bởi builder server-side khi bấm nút tạo.</div>
+    </aside>
+</section>

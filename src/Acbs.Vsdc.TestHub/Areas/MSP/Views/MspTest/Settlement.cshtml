@@ -1,0 +1,46 @@
+@model SettlementForm
+@{
+    var buy = ViewContext.RouteData.Values["action"]?.ToString() == "BuySettlement";
+    ViewData["Title"] = buy ? "MT541 - Chỉ thị thanh toán mua" : "MT543 - Chỉ thị thanh toán bán";
+    var operationCode = buy ? "MSP_SETTLEMENT_BUY" : "MSP_SETTLEMENT_SELL";
+    var mt = buy ? "541" : "543";
+}
+
+<div class="page-title compact-title">
+    <div>
+        <span class="eyebrow">Mode Test MSP / Module C</span>
+        <h1>@ViewData["Title"]</h1>
+        <p>Tạo chỉ thị thanh toán giao dịch mua/bán, review thông tin chứng khoán, tiền, phí/thuế trước khi gửi.</p>
+    </div>
+    <div class="title-actions"><a class="btn" asp-action="Index">← Danh mục MSP</a><a class="btn" asp-area="" asp-controller="Messages" asp-action="Index">Xem điện</a></div>
+</div>
+
+<section class="msp-editor-layout" data-msp-editor data-msp-type="@mt" data-msp-function="Thanh toán giao dịch" data-msp-operation="@operationCode">
+    <aside class="msp-editor-side"><div class="side-card active"><span>C</span><b>@ViewData["Title"]</b><small>@operationCode</small></div><div class="side-note"><b>Tag chính</b><p>:20C::SEME, :97A::SAFE, :35B, :98A::TRAD, :36B::SETT, amount/price/party.</p></div><div class="side-note"><b>Đối chiếu</b><p>Kiểm tra ngày giao dịch, ISIN, khối lượng, giá trị thanh toán và BIC đối tác.</p></div></aside>
+    <section class="panel msp-editor-main">
+        <form method="post" class="msp-form" data-preview-form>
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="All" class="validation"></div>
+            <div class="section-caption"><span>01</span><b>Thông tin giao dịch</b></div>
+            <div class="form-grid compact">
+                <label>Reference<input asp-for="Reference" data-fin="reference" /></label>
+                <label>Ngân hàng nhận / Block 2<input asp-for="ReceiverBic" data-fin="receiverBic" list="receiver-bank-list" /></label>
+                <label>Tài khoản SAFE<input asp-for="AccountNo" data-fin="account" /></label>
+                <label>ISIN<input asp-for="Isin" data-fin="isin" /></label>
+                <label>Ngày giao dịch<input type="date" asp-for="TradeDate" data-fin="date" /></label>
+            </div>
+            <div class="section-caption"><span>02</span><b>Khối lượng và tiền</b></div>
+            <div class="form-grid compact">
+                <label>Giá<input asp-for="Price" data-fin="price" /></label>
+                <label>Khối lượng<input asp-for="Quantity" data-fin="quantity" /></label>
+                <label>Giá trị thanh toán<input asp-for="SettlementAmount" data-fin="amount" /></label>
+                <label>BIC NHLK / Settlement Party<input asp-for="CounterpartyBic" data-fin="bic" list="receiver-bank-list" /></label>
+                <label>Phí<input asp-for="FeeAmount" data-fin="fee" /></label>
+                <label>Thuế<input asp-for="TaxAmount" data-fin="tax" /></label>
+                <label class="wide">Diễn giải<textarea asp-for="Narrative" rows="3" data-fin="narrative"></textarea></label>
+            </div>
+            <div class="actions editor-actions"><button type="button" class="btn" data-refresh-preview>🔄 Cập nhật review</button><button class="btn primary" type="submit">📤 Tạo MT@mt vào Send</button></div>
+        <datalist id="receiver-bank-list"><option value="VSDC404X">Citibank</option><option value="VSDC403X">Deutsche Bank</option></datalist></form>
+    </section>
+    <aside class="panel msp-preview-panel"><div class="preview-head"><div><span class="eyebrow">Review điện</span><h2>Raw FIN preview</h2></div><button class="btn tiny" type="button" data-copy-preview>Copy</button></div><div class="preview-meta"><span>Message Type: <b>MT@mt</b></span><span>Operation: <b>@operationCode</b></span></div><pre class="fin-preview" data-fin-preview></pre><div class="preview-warning">Review nhanh các thông tin thanh toán trước khi gửi file vào Send.</div></aside>
+</section>

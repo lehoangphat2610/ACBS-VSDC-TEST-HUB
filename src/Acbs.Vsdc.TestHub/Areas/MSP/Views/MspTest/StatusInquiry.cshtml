@@ -1,0 +1,13 @@
+@model StatusInquiryForm
+@{
+    ViewData["Title"] = "MT199/MT599 - Tra soát trạng thái";
+}
+<div class="page-title compact-title">
+    <div><span class="eyebrow">Mode Test MSP / Module D</span><h1>Tra soát trạng thái xử lý điện</h1><p>Tạo điện tra soát theo reference gốc, loại điện gốc và thông tin nghiệp vụ liên quan.</p></div>
+    <div class="title-actions"><a class="btn" asp-action="Index">← Danh mục MSP</a><a class="btn" asp-area="" asp-controller="Messages" asp-action="Index">Xem điện</a></div>
+</div>
+<section class="msp-editor-layout" data-msp-editor data-msp-type="199" data-msp-function="Tra soát trạng thái" data-msp-operation="MSP_STATUS_INQUIRY">
+    <aside class="msp-editor-side"><div class="side-card active"><span>D</span><b>Tra soát trạng thái</b><small>MSP_STATUS_INQUIRY</small></div><div class="side-note"><b>Dữ liệu cần có</b><p>Reference hiện tại, loại điện gốc, reference gốc và nếu có thì tài khoản/ISIN/ngày giao dịch.</p></div></aside>
+    <section class="panel msp-editor-main"><form method="post" class="msp-form" data-preview-form>@Html.AntiForgeryToken()<div asp-validation-summary="All" class="validation"></div><div class="section-caption"><span>01</span><b>Thông tin tra soát</b></div><div class="form-grid compact"><label>Reference<input asp-for="Reference" data-fin="reference" /></label><label>Ngân hàng nhận / Block 2<input asp-for="ReceiverBic" data-fin="receiverBic" list="receiver-bank-list" /></label><label>Loại điện gốc<input asp-for="OriginalMessageType" data-fin="originalType" /></label><label>Reference gốc<input asp-for="OriginalReference" data-fin="originalRef" /></label><label>Tài khoản<input asp-for="AccountNo" data-fin="account" /></label><label>ISIN<input asp-for="Isin" data-fin="isin" /></label><label>Ngày giao dịch<input type="date" asp-for="TradeDate" data-fin="date" /></label></div><div class="actions editor-actions"><button type="button" class="btn" data-refresh-preview>🔄 Cập nhật review</button><button class="btn primary" type="submit">📤 Tạo điện tra soát</button></div><datalist id="receiver-bank-list"><option value="VSDC404X">Citibank</option><option value="VSDC403X">Deutsche Bank</option></datalist></form></section>
+    <aside class="panel msp-preview-panel"><div class="preview-head"><div><span class="eyebrow">Review điện</span><h2>Raw FIN preview</h2></div><button class="btn tiny" type="button" data-copy-preview>Copy</button></div><div class="preview-meta"><span>Message Type: <b>MT199/599</b></span><span>Operation: <b>MSP_STATUS_INQUIRY</b></span></div><pre class="fin-preview" data-fin-preview></pre><div class="preview-warning">Review reference gốc để tránh tra soát nhầm điện.</div></aside>
+</section>
