@@ -1,0 +1,5 @@
+USE [ACBS_VSDC_TESTHUB];
+GO
+SELECT TOP 100 * FROM vsdc.GatewayMessages ORDER BY Id DESC;
+SELECT TOP 100 * FROM vsdc.MspBusinessMessages ORDER BY Id DESC;
+SELECT TOP 100 * FROM vsdc.SystemLogs ORDER BY Id DESC;
