@@ -1,0 +1,21 @@
+SwiftTime=20260123 06:46:15 
+NonRep=FALSE
+DeliveryTime=20260123 06:46:15 
+MsgId= 
+Creationtime=20260123 06:46:15 
+PDIndication=FALSE 
+Requestor=o=VSDCSVN6, o=swift 
+Responder=o=VSDC001X, o=swift 
+Service=swift.corp.fast 
+RequestType=camt.xxx.fisp.rep 
+Priority=Normal
+RequestRef=
+TransferRef=X_.DTTTBC
+TransferDescription=
+TransferInfo=VSDC001X.X_.DTTTBC.20260123 06:46:15.
+PossibleDuplicate=TRUE
+OrigTransferRef=DTTTBC10027
+AckIndicator=FALSE
+LogicalName=PACK.VSDC001X_1769150763160.DTTTBC10027.csv
+FileInfo=SwCompression=None
+Size=0
